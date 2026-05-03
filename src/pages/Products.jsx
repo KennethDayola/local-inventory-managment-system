@@ -222,7 +222,7 @@ export default function Products() {
       <Box sx={{ mb: { xs: 2, sm: 3.5 } }}>
         <Typography
           variant="h5"
-          sx={{ color: "#0f172a", mb: 0.5, fontWeight: 500, fontSize: { xs: "1.1rem", sm: "1.25rem" } }}
+          sx={{ color: "#0f172a", mb: 0.5, fontWeight: 600, fontSize: { xs: "1.1rem", sm: "1.25rem" } }}
         >
           Products
         </Typography>
