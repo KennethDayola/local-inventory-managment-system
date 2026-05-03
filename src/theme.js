@@ -5,24 +5,43 @@ const theme = createTheme({
     mode: "light",
     primary: { main: "#3b82f6" },
     secondary: { main: "#8b5cf6" },
-    background: { default: "#f1f5f9", paper: "#ffffff" },
+    background: { default: "#ffffff", paper: "#ffffff" },
     success: { main: "#10b981" },
     error: { main: "#ef4444" },
     warning: { main: "#f59e0b" },
   },
   typography: {
-    fontFamily: "'Inter', 'Segoe UI', sans-serif",
-    h5: { fontWeight: 700 },
-    h6: { fontWeight: 600 },
+    fontFamily: "'Inter', 'DM Sans', 'Segoe UI', sans-serif",
+    fontWeightRegular: 400,
+    fontWeightMedium: 500,
+    fontWeightBold: 600,
+    h5: { fontWeight: 600, letterSpacing: "-0.3px" }, // lighter — was 600
+    h6: { fontWeight: 600, letterSpacing: "-0.2px" },
+    subtitle1: { fontWeight: 500 },
+    body1: { fontWeight: 400 },
+    body2: { fontWeight: 400, color: "#64748b" },
+    caption: { fontWeight: 400 },
   },
-  shape: { borderRadius: 12 },
+  shape: { borderRadius: 14 },
   components: {
+    MuiCssBaseline: {
+      styleOverrides: `
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+        * { box-sizing: border-box; }
+        body { background: #ffffff; }
+      `,
+    },
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 16,
-          border: "1px solid rgba(0,0,0,0.06)",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04)",
+          borderRadius: 18,
+          border: "1px solid rgba(0,0,0,0.05)",
+          boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
+          transition: "box-shadow 0.2s ease, transform 0.2s ease",
+          "&:hover": {
+            boxShadow: "0 8px 28px rgba(0,0,0,0.09)",
+            transform: "translateY(-2px)",
+          },
         },
       },
     },
@@ -31,7 +50,8 @@ const theme = createTheme({
         root: {
           borderRadius: 10,
           textTransform: "none",
-          fontWeight: 600,
+          fontWeight: 500,
+          fontSize: "0.875rem",
           boxShadow: "none",
           "&:hover": { boxShadow: "none" },
         },
@@ -43,6 +63,7 @@ const theme = createTheme({
           "& .MuiOutlinedInput-root": {
             borderRadius: 10,
             backgroundColor: "#f8fafc",
+            fontSize: "0.875rem",
           },
         },
       },
@@ -50,9 +71,9 @@ const theme = createTheme({
     MuiTableContainer: {
       styleOverrides: {
         root: {
-          borderRadius: 16,
-          border: "1px solid rgba(0,0,0,0.06)",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+          borderRadius: 18,
+          border: "1px solid rgba(0,0,0,0.05)",
+          boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
         },
       },
     },
@@ -61,12 +82,12 @@ const theme = createTheme({
         root: {
           "& .MuiTableCell-head": {
             backgroundColor: "#f8fafc",
-            fontWeight: 600,
-            fontSize: "0.78rem",
+            fontWeight: 500,
+            fontSize: "0.75rem",
             textTransform: "uppercase",
-            letterSpacing: "0.05em",
-            color: "#64748b",
-            borderBottom: "1px solid rgba(0,0,0,0.06)",
+            letterSpacing: "0.06em",
+            color: "#94a3b8",
+            borderBottom: "1px solid rgba(0,0,0,0.05)",
           },
         },
       },
@@ -74,25 +95,31 @@ const theme = createTheme({
     MuiTableRow: {
       styleOverrides: {
         root: {
-          "&:hover": { backgroundColor: "#f8fafc" },
+          transition: "background 0.15s",
+          "&:hover": { backgroundColor: "#f0f7ff" },
           "&:last-child td": { borderBottom: 0 },
+        },
+      },
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          fontSize: "0.875rem",
+          borderBottom: "1px solid rgba(0,0,0,0.04)",
+          padding: "14px 16px",
         },
       },
     },
     MuiChip: {
       styleOverrides: {
-        root: { borderRadius: 8, fontWeight: 600, fontSize: "0.75rem" },
+        root: { borderRadius: 8, fontWeight: 500, fontSize: "0.72rem" },
       },
     },
     MuiDialog: {
-      styleOverrides: {
-        paper: { borderRadius: 20 },
-      },
+      styleOverrides: { paper: { borderRadius: 20 } },
     },
     MuiAlert: {
-      styleOverrides: {
-        root: { borderRadius: 12 },
-      },
+      styleOverrides: { root: { borderRadius: 12 } },
     },
   },
 })
