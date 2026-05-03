@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
-import { ThemeProvider, CssBaseline, Box, CircularProgress } from "@mui/material"
+import { ThemeProvider, CssBaseline, Box, CircularProgress, useMediaQuery, useTheme } from "@mui/material"
 import { onAuthStateChanged } from "firebase/auth"
 import { auth } from "./firebase"
 import theme from "./theme"
@@ -12,16 +12,26 @@ import Sales from "./pages/Sales"
 import Login from "./pages/Login"
 
 function AppLayout() {
+  const muiTheme = useTheme()
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"))
+
   return (
     <Box sx={{ display: "flex" }}>
       <Sidebar />
-      <Box sx={{ ml: "210px", flex: 1, minHeight: "100vh", backgroundColor: "#fafbff" }}>
+      <Box
+        sx={{
+          // On mobile: no left margin (sidebar is hidden), add bottom padding for bottom nav
+          ml: isMobile ? 0 : "210px",
+          flex: 1,
+          minHeight: "100vh",
+          backgroundColor: "#fafbff",
+        }}
+      >
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/products" element={<Products />} />
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/sales" element={<Sales />} />
-          {/* Catch-all: redirect unknown paths to dashboard */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Box>
@@ -30,7 +40,6 @@ function AppLayout() {
 }
 
 export default function App() {
-  // null = still checking, false = not logged in, object = logged in
   const [user, setUser] = useState(null)
   const [checking, setChecking] = useState(true)
 
@@ -42,12 +51,19 @@ export default function App() {
     return unsub
   }, [])
 
-  // Show a centered spinner while Firebase checks the session
   if (checking) {
     return (
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Box sx={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#fafbff" }}>
+        <Box
+          sx={{
+            minHeight: "100vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#fafbff",
+          }}
+        >
           <CircularProgress size={32} sx={{ color: "#3b82f6" }} />
         </Box>
       </ThemeProvider>
@@ -59,12 +75,10 @@ export default function App() {
       <CssBaseline />
       <BrowserRouter>
         <Routes>
-          {/* Public route */}
           <Route
             path="/login"
             element={user ? <Navigate to="/" replace /> : <Login />}
           />
-          {/* Protected routes — redirect to /login if not authenticated */}
           <Route
             path="/*"
             element={user ? <AppLayout /> : <Navigate to="/login" replace />}

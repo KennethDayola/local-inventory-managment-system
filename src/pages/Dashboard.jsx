@@ -4,7 +4,7 @@ import { db } from "../firebase"
 import {
   Box, Card, CardContent, Typography,
   Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, Paper, Chip
+  TableHead, TableRow, Paper, Chip, useMediaQuery, useTheme
 } from "@mui/material"
 import TrendingUpIcon from "@mui/icons-material/TrendingUp"
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined"
@@ -68,12 +68,12 @@ function GradientStatCard({ icon, iconBg, value, label, danger }) {
         "&:hover::before": { opacity: 1 },
       }}
     >
-      <CardContent sx={{ p: "20px !important", position: "relative", zIndex: 1 }}>
-        <Box sx={{ mb: 2 }}>
+      <CardContent sx={{ p: "16px !important", position: "relative", zIndex: 1 }}>
+        <Box sx={{ mb: 1.5 }}>
           <Box
             sx={{
-              width: 40,
-              height: 40,
+              width: 36,
+              height: 36,
               borderRadius: "10px",
               backgroundColor: iconBg,
               display: "flex",
@@ -98,7 +98,7 @@ function GradientStatCard({ icon, iconBg, value, label, danger }) {
 
         <Typography
           sx={{
-            fontSize: "1.6rem",
+            fontSize: { xs: "1.1rem", sm: "1.6rem" },
             fontWeight: 600,
             lineHeight: 1.1,
             letterSpacing: "-0.5px",
@@ -113,7 +113,7 @@ function GradientStatCard({ icon, iconBg, value, label, danger }) {
 
         <Typography
           sx={{
-            fontSize: "0.78rem",
+            fontSize: { xs: "0.68rem", sm: "0.78rem" },
             fontWeight: 400,
             color: "#94a3b8",
             transition: "color 0.35s ease",
@@ -130,6 +130,8 @@ function GradientStatCard({ icon, iconBg, value, label, danger }) {
 export default function Dashboard() {
   const [products, setProducts] = useState([])
   const [transactions, setTransactions] = useState([])
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
 
   useEffect(() => {
     const u1 = onSnapshot(collection(db, "products"), (s) =>
@@ -162,38 +164,37 @@ export default function Dashboard() {
     {
       label: "Sales today",
       value: fmt(todaySales),
-      icon: <TrendingUpIcon sx={{ fontSize: 22, color: "#f59e0b" }} />,
+      icon: <TrendingUpIcon sx={{ fontSize: 20, color: "#f59e0b" }} />,
       iconBg: "#fffbeb",
     },
     {
       label: "Overall sales",
       value: fmt(totalSales),
-      icon: <ReceiptLongOutlinedIcon sx={{ fontSize: 22, color: "#8b5cf6" }} />,
+      icon: <ReceiptLongOutlinedIcon sx={{ fontSize: 20, color: "#8b5cf6" }} />,
       iconBg: "#f3f0ff",
     },
     {
       label: "Inventory value",
       value: fmt(inventoryValue),
-      icon: <PaidOutlinedIcon sx={{ fontSize: 22, color: "#10b981" }} />,
+      icon: <PaidOutlinedIcon sx={{ fontSize: 20, color: "#10b981" }} />,
       iconBg: "#ecfdf5",
     },
     {
       label: "Total products",
       value: products.length,
-      icon: <Inventory2OutlinedIcon sx={{ fontSize: 22, color: "#3b82f6" }} />,
+      icon: <Inventory2OutlinedIcon sx={{ fontSize: 20, color: "#3b82f6" }} />,
       iconBg: "#eff6ff",
     },
     {
       label: "Low stock",
       value: lowStock.length,
-      icon: <WarningAmberOutlinedIcon sx={{ fontSize: 22, color: lowStock.length > 0 ? "#ef4444" : "#10b981" }} />,
+      icon: <WarningAmberOutlinedIcon sx={{ fontSize: 20, color: lowStock.length > 0 ? "#ef4444" : "#10b981" }} />,
       iconBg: lowStock.length > 0 ? "#fef2f2" : "#ecfdf5",
       danger: lowStock.length > 0,
     },
   ]
 
   const panelCardSx = {
-    minWidth: 220,
     transition: "box-shadow 0.25s ease, border-color 0.25s ease, transform 0.25s ease",
     "&:hover": {
       transform: "translateY(-3px) scale(1.015)",
@@ -203,39 +204,72 @@ export default function Dashboard() {
   }
 
   return (
-    <Box sx={{ p: 3.5, pr: 13, minHeight: "100vh", backgroundColor: "#fff" }}>
+    <Box
+      sx={{
+        p: { xs: 2, sm: 3.5 },
+        pr: { xs: 2, sm: 13 },
+        pb: { xs: "84px", sm: 3.5 },
+        minHeight: "100vh",
+        backgroundColor: "#fff",
+      }}
+    >
       {/* Header */}
-      <Box sx={{ mb: 3.5 }}>
-        <Typography variant="h5" sx={{ color: "#0f172a", mb: 0.5, fontWeight: 500 }}>
+      <Box sx={{ mb: { xs: 2.5, sm: 3.5 } }}>
+        <Typography
+          variant="h5"
+          sx={{ color: "#0f172a", mb: 0.5, fontWeight: 600, fontSize: { xs: "1.1rem", sm: "1.25rem" } }}
+        >
           Dashboard
         </Typography>
-        <Typography variant="body2" sx={{ color: "#94a3b8" }}>
+        <Typography variant="body2" sx={{ color: "#94a3b8", fontSize: "0.78rem" }}>
           {new Date().toLocaleDateString("en-PH", {
             weekday: "long", year: "numeric", month: "long", day: "numeric",
           })}
         </Typography>
       </Box>
 
-      {/* Stat Cards */}
-      <Box sx={{ display: "flex", gap: 2.5, mb: 4, width: "100%" }}>
+      {/* Stat Cards — 2-col grid on mobile, 5-col on desktop */}
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr 1fr", sm: "repeat(5, 1fr)" },
+          gap: { xs: 1.5, sm: 2.5 },
+          mb: { xs: 2.5, sm: 4 },
+        }}
+      >
         {STATS.map((card) => (
-          <Box key={card.label} sx={{ flex: 1, minWidth: 0 }}>
-            <GradientStatCard
-              icon={card.icon}
-              iconBg={card.iconBg}
-              value={card.value}
-              label={card.label}
-              danger={card.danger}
-            />
-          </Box>
+          <GradientStatCard
+            key={card.label}
+            icon={card.icon}
+            iconBg={card.iconBg}
+            value={card.value}
+            label={card.label}
+            danger={card.danger}
+          />
         ))}
       </Box>
 
-      {/* Bottom panels */}
-      <Box sx={{ display: "flex", gap: 2.5, width: "100%", minHeight: 400 }}>
+      {/* Bottom panels — stacked on mobile, side-by-side on desktop */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
+          gap: 2.5,
+          width: "100%",
+          minHeight: { xs: "auto", sm: 400 },
+        }}
+      >
         {/* Recent Sales */}
         <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Card elevation={0} sx={{ ...panelCardSx, height: "100%", border: "1px solid rgba(0,0,0,0.06)", borderRadius: "12px" }}>
+          <Card
+            elevation={0}
+            sx={{
+              ...panelCardSx,
+              height: "100%",
+              border: "1px solid rgba(0,0,0,0.06)",
+              borderRadius: "12px",
+            }}
+          >
             <CardContent sx={{ p: "20px !important" }}>
               <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 0.5 }}>
                 <Typography variant="h6" sx={{ fontSize: "0.95rem", color: "#0f172a" }}>
@@ -249,41 +283,71 @@ export default function Dashboard() {
                   />
                 )}
               </Box>
-              <Typography sx={{ fontSize: "0.78rem", color: "#94a3b8", mb: 2.5 }}>
+              <Typography sx={{ fontSize: "0.78rem", color: "#94a3b8", mb: 2 }}>
                 Latest transactions
               </Typography>
 
               {recentSales.length === 0 ? (
                 <Box sx={{ textAlign: "center", py: 5 }}>
-                  <Box
-                    component="img"
-                    src="https://i.imgur.com/hg4TsKo.png"
-                    alt="No sales"
-                    sx={{ width: 110, mb: 1.5, opacity: 0.1 }}
-                  />
+                  <Box component="img" src="https://i.imgur.com/hg4TsKo.png" alt="No sales"
+                    sx={{ width: 110, mb: 1.5, opacity: 0.1 }} />
                   <Typography variant="body2" color="text.secondary">No sales yet</Typography>
                 </Box>
-              ) : (
-                <TableContainer
-                  component={Paper}
-                  elevation={0}
-                  sx={{ border: "none", boxShadow: "none", borderRadius: 0 }}
-                >
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow
+              ) : isMobile ? (
+                /* Mobile: compact card rows */
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                  {recentSales.map((t) => {
+                    const d = new Date(t.timestamp.seconds * 1000)
+                    const isToday = d.toDateString() === todayStr
+                    return (
+                      <Box
+                        key={t.id}
                         sx={{
-                          "& .MuiTableCell-root": {
-                            fontSize: "0.72rem",
-                            fontWeight: 600,
-                            color: "#64748b",
-                            textTransform: "uppercase",
-                            letterSpacing: "0.05em",
-                            borderBottom: "1px solid rgba(0,0,0,0.06)",
-                            py: 1,
-                          },
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          p: 1.25,
+                          borderRadius: "10px",
+                          border: "1px solid rgba(0,0,0,0.05)",
+                          backgroundColor: "#fafbfc",
                         }}
                       >
+                        <Box sx={{ flex: 1, minWidth: 0, mr: 1 }}>
+                          <Typography sx={{
+                            fontSize: "0.82rem", fontWeight: 500, color: "#0f172a",
+                            whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+                          }}>
+                            {t.productName}
+                          </Typography>
+                          <Typography sx={{ fontSize: "0.7rem", color: "#94a3b8" }}>
+                            {t.category} · qty {t.qty}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ textAlign: "right", flexShrink: 0 }}>
+                          <Typography sx={{ fontSize: "0.82rem", fontWeight: 600, color: "#10b981" }}>
+                            {fmt(t.total)}
+                          </Typography>
+                          <Typography sx={{ fontSize: "0.68rem", color: "#94a3b8" }}>
+                            {isToday
+                              ? d.toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit" })
+                              : d.toLocaleDateString("en-PH", { month: "short", day: "numeric" })}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    )
+                  })}
+                </Box>
+              ) : (
+                <TableContainer component={Paper} elevation={0} sx={{ border: "none", boxShadow: "none", borderRadius: 0 }}>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow sx={{
+                        "& .MuiTableCell-root": {
+                          fontSize: "0.72rem", fontWeight: 600, color: "#64748b",
+                          textTransform: "uppercase", letterSpacing: "0.05em",
+                          borderBottom: "1px solid rgba(0,0,0,0.06)", py: 1,
+                        },
+                      }}>
                         {["Product", "Qty", "Total", "Time"].map((h) => (
                           <TableCell key={h}>{h}</TableCell>
                         ))}
@@ -294,42 +358,26 @@ export default function Dashboard() {
                         const d = new Date(t.timestamp.seconds * 1000)
                         const isToday = d.toDateString() === todayStr
                         return (
-                          <TableRow
-                            key={t.id}
-                            sx={{
-                              cursor: "default",
-                              "&:hover": { backgroundColor: "#f8fafc" },
-                              "& .MuiTableCell-root": {
-                                borderBottom: "1px solid rgba(0,0,0,0.04)",
-                                fontSize: "0.875rem",
-                              },
-                            }}
-                          >
+                          <TableRow key={t.id} sx={{
+                            cursor: "default",
+                            "&:hover": { backgroundColor: "#f8fafc" },
+                            "& .MuiTableCell-root": { borderBottom: "1px solid rgba(0,0,0,0.04)", fontSize: "0.875rem" },
+                          }}>
                             <TableCell>
-                              <Typography sx={{ fontSize: "0.85rem", fontWeight: 500, color: "#0f172a" }}>
-                                {t.productName}
-                              </Typography>
-                              <Typography sx={{ fontSize: "0.72rem", color: "#94a3b8" }}>
-                                {t.category}
-                              </Typography>
+                              <Typography sx={{ fontSize: "0.85rem", fontWeight: 500, color: "#0f172a" }}>{t.productName}</Typography>
+                              <Typography sx={{ fontSize: "0.72rem", color: "#94a3b8" }}>{t.category}</Typography>
                             </TableCell>
                             <TableCell sx={{ fontSize: "0.85rem" }}>{t.qty}</TableCell>
-                            <TableCell sx={{ fontWeight: 500, color: "#10b981", fontSize: "0.85rem" }}>
-                              {fmt(t.total)}
-                            </TableCell>
+                            <TableCell sx={{ fontWeight: 500, color: "#10b981", fontSize: "0.85rem" }}>{fmt(t.total)}</TableCell>
                             <TableCell>
                               <Chip
-                                label={
-                                  isToday
-                                    ? d.toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit" })
-                                    : d.toLocaleDateString("en-PH", { month: "short", day: "numeric" })
-                                }
+                                label={isToday
+                                  ? d.toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit" })
+                                  : d.toLocaleDateString("en-PH", { month: "short", day: "numeric" })}
                                 size="small"
-                                sx={
-                                  isToday
-                                    ? { backgroundColor: "#eff6ff", color: "#3b82f6", fontSize: "0.7rem" }
-                                    : { fontSize: "0.7rem" }
-                                }
+                                sx={isToday
+                                  ? { backgroundColor: "#eff6ff", color: "#3b82f6", fontSize: "0.7rem" }
+                                  : { fontSize: "0.7rem" }}
                               />
                             </TableCell>
                           </TableRow>
@@ -352,26 +400,17 @@ export default function Dashboard() {
                   Low stock alerts
                 </Typography>
                 {lowStock.length > 0 && (
-                  <Chip
-                    label={lowStock.length}
-                    color="error"
-                    size="small"
-                    sx={{ fontSize: "0.7rem", fontWeight: 500 }}
-                  />
+                  <Chip label={lowStock.length} color="error" size="small" sx={{ fontSize: "0.7rem", fontWeight: 500 }} />
                 )}
               </Box>
-              <Typography sx={{ fontSize: "0.78rem", color: "#94a3b8", mb: 2.5 }}>
+              <Typography sx={{ fontSize: "0.78rem", color: "#94a3b8", mb: 2 }}>
                 Items needing restock
               </Typography>
 
               {lowStock.length === 0 ? (
                 <Box sx={{ textAlign: "center", py: 5 }}>
-                  <Box
-                    component="img"
-                    src="https://i.imgur.com/hHpdKIl.png"
-                    alt="All stocked up"
-                    sx={{ width: 110, mb: 1.5, opacity: 0.1 }}
-                  />
+                  <Box component="img" src="https://i.imgur.com/hHpdKIl.png" alt="All stocked up"
+                    sx={{ width: 110, mb: 1.5, opacity: 0.1 }} />
                   <Typography variant="body2" color="text.secondary">All stocked up!</Typography>
                 </Box>
               ) : (
@@ -391,18 +430,19 @@ export default function Dashboard() {
                       "&:hover": { backgroundColor: "#fef2f2" },
                     }}
                   >
-                    <Box>
-                      <Typography sx={{ fontSize: "0.85rem", fontWeight: 500, color: "#0f172a" }}>
+                    <Box sx={{ flex: 1, minWidth: 0, mr: 1 }}>
+                      <Typography sx={{
+                        fontSize: "0.85rem", fontWeight: 500, color: "#0f172a",
+                        whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+                      }}>
                         {p.name}
                       </Typography>
-                      <Typography sx={{ fontSize: "0.72rem", color: "#94a3b8" }}>
-                        {p.category}
-                      </Typography>
+                      <Typography sx={{ fontSize: "0.72rem", color: "#94a3b8" }}>{p.category}</Typography>
                     </Box>
                     <Chip
                       label={`${p.stock} left`}
                       size="small"
-                      sx={{ backgroundColor: "#fef2f2", color: "#ef4444", fontSize: "0.7rem", fontWeight: 500 }}
+                      sx={{ backgroundColor: "#fef2f2", color: "#ef4444", fontSize: "0.7rem", fontWeight: 500, flexShrink: 0 }}
                     />
                   </Box>
                 ))

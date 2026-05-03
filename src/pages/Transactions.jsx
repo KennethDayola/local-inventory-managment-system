@@ -4,7 +4,8 @@ import { db } from "../firebase"
 import {
   Box, Typography, TextField, OutlinedInput, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, Paper, Button,
-  Chip, Alert, Card, CardContent, InputAdornment, IconButton
+  Chip, Alert, Card, CardContent, InputAdornment, IconButton,
+  useMediaQuery, useTheme
 } from "@mui/material"
 import AddIcon from "@mui/icons-material/Add"
 import RemoveIcon from "@mui/icons-material/Remove"
@@ -29,6 +30,8 @@ export default function Transactions() {
   const [selectedId, setSelectedId] = useState(null)
   const [qty, setQty] = useState("1")
   const [status, setStatus] = useState(null)
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
 
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "products"), (snap) => {
@@ -66,7 +69,6 @@ export default function Transactions() {
       total: 0,
       timestamp: serverTimestamp(),
     })
-
     showStatus(`Restocked +${q} units for "${selected.name}"!`, "success")
   }
 
@@ -87,18 +89,28 @@ export default function Transactions() {
       total: selected.price * q,
       timestamp: serverTimestamp(),
     })
-
     showStatus(`Sold -${q} units of "${selected.name}"!`, "info")
   }
 
   return (
-    <Box sx={{ p: 3.5, pr: 13, minHeight: "100vh", backgroundColor: "#fff" }}>
+    <Box
+      sx={{
+        p: { xs: 2, sm: 3.5 },
+        pr: { xs: 2, sm: 13 },
+        pb: { xs: "84px", sm: 3.5 },
+        minHeight: "100vh",
+        backgroundColor: "#fff",
+      }}
+    >
       {/* Header */}
-      <Box sx={{ mb: 3.5 }}>
-        <Typography variant="h5" sx={{ color: "#0f172a", mb: 0.5, fontWeight: 500 }}>
+      <Box sx={{ mb: { xs: 2, sm: 3.5 } }}>
+        <Typography
+          variant="h5"
+          sx={{ color: "#0f172a", mb: 0.5, fontWeight: 600, fontSize: { xs: "1.1rem", sm: "1.25rem" } }}
+        >
           Restock / Sell
         </Typography>
-        <Typography variant="body2" sx={{ color: "#94a3b8" }}>
+        <Typography variant="body2" sx={{ color: "#94a3b8", fontSize: "0.78rem" }}>
           Select a product then restock or sell
         </Typography>
       </Box>
@@ -109,7 +121,7 @@ export default function Transactions() {
           severity={status.severity}
           onClose={() => setStatus(null)}
           sx={{
-            mb: 2.5,
+            mb: 2,
             borderRadius: "10px",
             fontSize: "0.875rem",
             border: "1px solid",
@@ -127,16 +139,19 @@ export default function Transactions() {
       {selected ? (
         <Card
           elevation={0}
-          sx={{
-            mb: 2.5,
-            border: "1px solid #3b82f6",
-            borderRadius: "12px",
-            backgroundColor: "#eff6ff",
-          }}
+          sx={{ mb: 2, border: "1px solid #3b82f6", borderRadius: "12px", backgroundColor: "#eff6ff" }}
         >
-          <CardContent sx={{ py: "14px !important", px: 2.5, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <Box>
-              <Typography sx={{ fontWeight: 600, color: "#0f172a", fontSize: "0.95rem" }}>
+          <CardContent
+            sx={{
+              py: "14px !important",
+              px: 2.5,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Box sx={{ flex: 1, minWidth: 0, mr: 1 }}>
+              <Typography sx={{ fontWeight: 600, color: "#0f172a", fontSize: "0.95rem", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                 {selected.name}
               </Typography>
               <Typography sx={{ fontSize: "0.78rem", color: "#64748b" }}>
@@ -148,8 +163,8 @@ export default function Transactions() {
               size="small"
               sx={
                 selected.stock <= selected.lowStockThreshold
-                  ? { backgroundColor: "#fef2f2", color: "#ef4444", fontWeight: 600, border: "none" }
-                  : { backgroundColor: "#ecfdf5", color: "#10b981", fontWeight: 600, border: "none" }
+                  ? { backgroundColor: "#fef2f2", color: "#ef4444", fontWeight: 600, border: "none", flexShrink: 0 }
+                  : { backgroundColor: "#ecfdf5", color: "#10b981", fontWeight: 600, border: "none", flexShrink: 0 }
               }
             />
           </CardContent>
@@ -157,44 +172,57 @@ export default function Transactions() {
       ) : (
         <Card
           elevation={0}
-          sx={{
-            mb: 2.5,
-            backgroundColor: "#f8fafc",
-            border: "1px dashed #cbd5e1",
-            borderRadius: "12px",
-          }}
+          sx={{ mb: 2, backgroundColor: "#f8fafc", border: "1px dashed #cbd5e1", borderRadius: "12px" }}
         >
           <CardContent sx={{ textAlign: "center", py: "16px !important" }}>
             <Typography sx={{ fontSize: "0.875rem", color: "#94a3b8" }}>
-              Click a product below to select it
+              Tap a product below to select it
             </Typography>
           </CardContent>
         </Card>
       )}
 
       {/* Action Bar */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 3, flexWrap: "wrap" }}>
-        {/* Quantity stepper */}
-        <Box sx={{
-          display: "flex", alignItems: "center",
-          border: "1px solid #cbd5e1", borderRadius: "10px", overflow: "hidden", height: 40,
-          width: "fit-content",
-        }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: { xs: 1, sm: 2 },
+          mb: 2.5,
+          flexWrap: "wrap",
+        }}
+      >
+        {/* Qty stepper */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            border: "1px solid #cbd5e1",
+            borderRadius: "10px",
+            overflow: "hidden",
+            height: 40,
+            width: "fit-content",
+          }}
+        >
           <IconButton
             size="small"
             onClick={() => setQty((v) => String(Math.max(1, parseInt(v) || 1) - 1))}
-            sx={{ borderRadius: 0, px: 1.2, height: "100%", "&:hover": { backgroundColor: "#f1f5f9" }, borderRight: "1px solid #cbd5e1" }}
+            sx={{
+              borderRadius: 0, px: 1.2, height: "100%",
+              "&:hover": { backgroundColor: "#f1f5f9" },
+              borderRight: "1px solid #cbd5e1",
+            }}
           >
             <RemoveIcon sx={{ fontSize: 16, color: "#64748b" }} />
           </IconButton>
           <OutlinedInput
             value={qty}
             onChange={(e) => setQty(e.target.value)}
-            inputProps={{ style: { textAlign: "center", padding: "0", fontSize: "0.875rem", fontWeight: 500, width: 36 } }}
+            inputProps={{
+              style: { textAlign: "center", padding: "0", fontSize: "0.875rem", fontWeight: 500, width: 36 },
+            }}
             sx={{
-              height: 40,
-              width: 60,
-              borderRadius: 0,
+              height: 40, width: 60, borderRadius: 0,
               backgroundColor: "transparent",
               "& fieldset": { border: "none" },
             }}
@@ -202,7 +230,11 @@ export default function Transactions() {
           <IconButton
             size="small"
             onClick={() => setQty((v) => String((parseInt(v) || 0) + 1))}
-            sx={{ borderRadius: 0, px: 1.2, height: "100%", "&:hover": { backgroundColor: "#f1f5f9" }, borderLeft: "1px solid #cbd5e1" }}
+            sx={{
+              borderRadius: 0, px: 1.2, height: "100%",
+              "&:hover": { backgroundColor: "#f1f5f9" },
+              borderLeft: "1px solid #cbd5e1",
+            }}
           >
             <AddIcon sx={{ fontSize: 16, color: "#64748b" }} />
           </IconButton>
@@ -219,6 +251,7 @@ export default function Transactions() {
             fontWeight: 500,
             fontSize: "0.875rem",
             boxShadow: "none",
+            flex: isMobile ? 1 : "none",
             "&:hover": { backgroundColor: "#059669", boxShadow: "0 4px 14px rgba(16,185,129,0.35)" },
           }}
         >
@@ -235,6 +268,7 @@ export default function Transactions() {
             fontWeight: 500,
             fontSize: "0.875rem",
             boxShadow: "none",
+            flex: isMobile ? 1 : "none",
             "&:hover": { backgroundColor: "#3b82f6", boxShadow: "0 4px 14px rgba(59,130,246,0.35)" },
           }}
         >
@@ -249,7 +283,7 @@ export default function Transactions() {
         onChange={(e) => setSearch(e.target.value)}
         size="small"
         sx={{
-          width: 280,
+          width: { xs: "100%", sm: 280 },
           mb: 2,
           "& .MuiOutlinedInput-root": {
             borderRadius: "10px",
@@ -267,84 +301,154 @@ export default function Transactions() {
         }}
       />
 
-      {/* Table */}
-      <TableContainer
-        component={Paper}
-        elevation={0}
-        sx={{ border: "1px solid rgba(0,0,0,0.06)", borderRadius: "12px", overflow: "hidden" }}
-      >
-        <Table>
-          <TableHead sx={tableHeadSx}>
-            <TableRow>
-              {["", "Name", "Category", "Price", "Stock"].map((h) => (
-                <TableCell key={h}>{h}</TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filtered.length === 0 ? (
+      {/* Product list — table on desktop, cards on mobile */}
+      {isMobile ? (
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+          {filtered.length === 0 ? (
+            <Box sx={{ textAlign: "center", py: 6 }}>
+              <Box component="img" src="https://i.imgur.com/LdImzVA.png" alt="No products"
+                sx={{ width: 110, mb: 1.5, opacity: 0.1, display: "block", mx: "auto" }} />
+              <Typography sx={{ color: "#94a3b8", fontSize: "0.875rem" }}>No products found.</Typography>
+            </Box>
+          ) : filtered.map((p) => {
+            const isSelected = selectedId === p.id
+            const isLow = p.stock <= p.lowStockThreshold
+            return (
+              <Card
+                key={p.id}
+                elevation={0}
+                onClick={() => setSelectedId(p.id)}
+                sx={{
+                  border: isSelected ? "1.5px solid #3b82f6" : "1px solid rgba(0,0,0,0.07)",
+                  borderRadius: "12px",
+                  backgroundColor: isSelected ? "#eff6ff" : "#fff",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                  "&:active": { transform: "scale(0.985)" },
+                }}
+              >
+                <CardContent sx={{ py: "12px !important", px: 2, display: "flex", alignItems: "center", gap: 1.5 }}>
+                  {/* Selection dot */}
+                  <Box
+                    sx={{
+                      width: 10, height: 10, borderRadius: "50%", flexShrink: 0,
+                      backgroundColor: isSelected ? "#3b82f6" : "#e2e8f0",
+                      border: isSelected ? "2px solid #93c5fd" : "2px solid #cbd5e1",
+                      transition: "all 0.2s ease",
+                    }}
+                  />
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Typography sx={{ fontSize: "0.875rem", fontWeight: 500, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {p.name}
+                    </Typography>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, mt: 0.25, flexWrap: "wrap" }}>
+                      <Chip
+                        label={p.category}
+                        size="small"
+                        sx={{ backgroundColor: "#eff6ff", color: "#3b82f6", fontSize: "0.68rem", fontWeight: 500, border: "none", height: 18 }}
+                      />
+                      <Typography sx={{ fontSize: "0.75rem", color: "#64748b" }}>
+                        ₱{p.price.toFixed(2)}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Chip
+                    label={`${p.stock} left`}
+                    size="small"
+                    sx={{
+                      backgroundColor: isLow ? "#fef2f2" : "#ecfdf5",
+                      color: isLow ? "#ef4444" : "#10b981",
+                      fontWeight: 600,
+                      fontSize: "0.72rem",
+                      border: "none",
+                      flexShrink: 0,
+                    }}
+                  />
+                </CardContent>
+              </Card>
+            )
+          })}
+        </Box>
+      ) : (
+        <TableContainer
+          component={Paper}
+          elevation={0}
+          sx={{ border: "1px solid rgba(0,0,0,0.06)", borderRadius: "12px", overflow: "hidden" }}
+        >
+          <Table>
+            <TableHead sx={tableHeadSx}>
               <TableRow>
-                <TableCell colSpan={5} align="center" sx={{ py: 5 }}>
-                  <Box component="img" src="https://i.imgur.com/LdImzVA.png" alt="No products" sx={{ width: 110, mb: 1.5, opacity: 0.1, display: "block", mx: "auto" }} />
-                  <Typography sx={{ color: "#94a3b8", fontSize: "0.875rem" }}>No products found.</Typography>
-                </TableCell>
+                {["", "Name", "Category", "Price", "Stock"].map((h) => (
+                  <TableCell key={h}>{h}</TableCell>
+                ))}
               </TableRow>
-            ) : filtered.map((p) => {
-              const isSelected = selectedId === p.id
-              return (
-                <TableRow
-                  key={p.id}
-                  onClick={() => setSelectedId(p.id)}
-                  sx={{
-                    cursor: "pointer",
-                    backgroundColor: isSelected ? "#eff6ff !important" : "inherit",
-                    outline: isSelected ? "1px solid #3b82f6" : "none",
-                    "&:hover": { backgroundColor: isSelected ? "#eff6ff" : "#f8fafc" },
-                    "& .MuiTableCell-root": {
-                      borderBottom: "1px solid rgba(0,0,0,0.04)",
-                      fontSize: "0.875rem",
-                      color: "#0f172a",
-                    },
-                  }}
-                >
-                  <TableCell padding="checkbox" sx={{ pl: 2 }}>
-                    <Box
-                      sx={{
-                        width: 10, height: 10, borderRadius: "50%",
-                        backgroundColor: isSelected ? "#3b82f6" : "#e2e8f0",
-                        border: isSelected ? "2px solid #93c5fd" : "2px solid #cbd5e1",
-                        transition: "all 0.2s ease",
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: 500 }}>{p.name}</TableCell>
-                  <TableCell>
-                    <Chip
-                      label={p.category}
-                      size="small"
-                      sx={{ backgroundColor: "#eff6ff", color: "#3b82f6", fontSize: "0.72rem", fontWeight: 500, border: "none" }}
-                    />
-                  </TableCell>
-                  <TableCell sx={{ color: "#64748b" }}>₱{p.price.toFixed(2)}</TableCell>
-                  <TableCell>
-                    <Chip
-                      label={p.stock}
-                      size="small"
-                      sx={{
-                        backgroundColor: p.stock <= p.lowStockThreshold ? "#fef2f2" : "#ecfdf5",
-                        color: p.stock <= p.lowStockThreshold ? "#ef4444" : "#10b981",
-                        fontWeight: 600,
-                        fontSize: "0.72rem",
-                        border: "none",
-                      }}
-                    />
+            </TableHead>
+            <TableBody>
+              {filtered.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} align="center" sx={{ py: 5 }}>
+                    <Box component="img" src="https://i.imgur.com/LdImzVA.png" alt="No products"
+                      sx={{ width: 110, mb: 1.5, opacity: 0.1, display: "block", mx: "auto" }} />
+                    <Typography sx={{ color: "#94a3b8", fontSize: "0.875rem" }}>No products found.</Typography>
                   </TableCell>
                 </TableRow>
-              )
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+              ) : filtered.map((p) => {
+                const isSelected = selectedId === p.id
+                return (
+                  <TableRow
+                    key={p.id}
+                    onClick={() => setSelectedId(p.id)}
+                    sx={{
+                      cursor: "pointer",
+                      backgroundColor: isSelected ? "#eff6ff !important" : "inherit",
+                      outline: isSelected ? "1px solid #3b82f6" : "none",
+                      "&:hover": { backgroundColor: isSelected ? "#eff6ff" : "#f8fafc" },
+                      "& .MuiTableCell-root": {
+                        borderBottom: "1px solid rgba(0,0,0,0.04)",
+                        fontSize: "0.875rem",
+                        color: "#0f172a",
+                      },
+                    }}
+                  >
+                    <TableCell padding="checkbox" sx={{ pl: 2 }}>
+                      <Box
+                        sx={{
+                          width: 10, height: 10, borderRadius: "50%",
+                          backgroundColor: isSelected ? "#3b82f6" : "#e2e8f0",
+                          border: isSelected ? "2px solid #93c5fd" : "2px solid #cbd5e1",
+                          transition: "all 0.2s ease",
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 500 }}>{p.name}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={p.category}
+                        size="small"
+                        sx={{ backgroundColor: "#eff6ff", color: "#3b82f6", fontSize: "0.72rem", fontWeight: 500, border: "none" }}
+                      />
+                    </TableCell>
+                    <TableCell sx={{ color: "#64748b" }}>₱{p.price.toFixed(2)}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={p.stock}
+                        size="small"
+                        sx={{
+                          backgroundColor: p.stock <= p.lowStockThreshold ? "#fef2f2" : "#ecfdf5",
+                          color: p.stock <= p.lowStockThreshold ? "#ef4444" : "#10b981",
+                          fontWeight: 600,
+                          fontSize: "0.72rem",
+                          border: "none",
+                        }}
+                      />
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
     </Box>
   )
 }
