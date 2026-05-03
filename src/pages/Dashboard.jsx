@@ -6,11 +6,11 @@ import {
   Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Paper, Chip
 } from "@mui/material"
-import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined"
+import TrendingUpIcon from "@mui/icons-material/TrendingUp"
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined"
 import PaidOutlinedIcon from "@mui/icons-material/PaidOutlined"
-import TodayOutlinedIcon from "@mui/icons-material/TodayOutlined"
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined"
+import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined"
 
 function GradientStatCard({ icon, iconBg, value, label, danger }) {
   const colorKey = danger
@@ -19,6 +19,8 @@ function GradientStatCard({ icon, iconBg, value, label, danger }) {
     ? "purple"
     : iconBg === "#ecfdf5"
     ? "green"
+    : iconBg === "#fffbeb"
+    ? "amber"
     : "blue"
 
   const restGradients = {
@@ -26,6 +28,7 @@ function GradientStatCard({ icon, iconBg, value, label, danger }) {
     purple: "linear-gradient(135deg, #f5f3ff 0%, #faf9ff 100%)",
     green:  "linear-gradient(135deg, #f0fdf4 0%, #f7fef9 100%)",
     red:    "linear-gradient(135deg, #fff5f5 0%, #fffafa 100%)",
+    amber:  "linear-gradient(135deg, #fef9ec 0%, #fffdf7 100%)",
   }
 
   const borderColors = {
@@ -33,6 +36,7 @@ function GradientStatCard({ icon, iconBg, value, label, danger }) {
     purple: "rgba(139,92,246,0.12)",
     green:  "rgba(16,185,129,0.12)",
     red:    "rgba(239,68,68,0.12)",
+    amber:  "rgba(245,158,11,0.12)",
   }
 
   return (
@@ -51,7 +55,6 @@ function GradientStatCard({ icon, iconBg, value, label, danger }) {
           boxShadow: "0 8px 28px rgba(59,130,246,0.2)",
           borderColor: "#3b82f6",
         },
-        // Dark blue gradient overlay on hover
         "&::before": {
           content: '""',
           position: "absolute",
@@ -62,9 +65,7 @@ function GradientStatCard({ icon, iconBg, value, label, danger }) {
           transition: "opacity 0.35s ease",
           zIndex: 0,
         },
-        "&:hover::before": {
-          opacity: 1,
-        },
+        "&:hover::before": { opacity: 1 },
       }}
     >
       <CardContent sx={{ p: "20px !important", position: "relative", zIndex: 1 }}>
@@ -161,8 +162,8 @@ export default function Dashboard() {
     {
       label: "Sales today",
       value: fmt(todaySales),
-      icon: <TodayOutlinedIcon sx={{ fontSize: 22, color: "#3b82f6" }} />,
-      iconBg: "#eff6ff",
+      icon: <TrendingUpIcon sx={{ fontSize: 22, color: "#f59e0b" }} />,
+      iconBg: "#fffbeb",
     },
     {
       label: "Overall sales",
@@ -234,7 +235,7 @@ export default function Dashboard() {
       <Box sx={{ display: "flex", gap: 2.5, width: "100%", minHeight: 400 }}>
         {/* Recent Sales */}
         <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Card elevation={0} sx={{ ...panelCardSx, height: "100%" }}>
+          <Card elevation={0} sx={{ ...panelCardSx, height: "100%", border: "1px solid rgba(0,0,0,0.06)", borderRadius: "12px" }}>
             <CardContent sx={{ p: "20px !important" }}>
               <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 0.5 }}>
                 <Typography variant="h6" sx={{ fontSize: "0.95rem", color: "#0f172a" }}>
@@ -254,7 +255,12 @@ export default function Dashboard() {
 
               {recentSales.length === 0 ? (
                 <Box sx={{ textAlign: "center", py: 5 }}>
-                  <Box component="img" src="https://i.imgur.com/hg4TsKo.png" alt="No sales" sx={{ width: 110, mb: 1.5, opacity: 0.1 }} />
+                  <Box
+                    component="img"
+                    src="https://i.imgur.com/hg4TsKo.png"
+                    alt="No sales"
+                    sx={{ width: 110, mb: 1.5, opacity: 0.1 }}
+                  />
                   <Typography variant="body2" color="text.secondary">No sales yet</Typography>
                 </Box>
               ) : (
@@ -265,7 +271,19 @@ export default function Dashboard() {
                 >
                   <Table size="small">
                     <TableHead>
-                      <TableRow>
+                      <TableRow
+                        sx={{
+                          "& .MuiTableCell-root": {
+                            fontSize: "0.72rem",
+                            fontWeight: 600,
+                            color: "#64748b",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.05em",
+                            borderBottom: "1px solid rgba(0,0,0,0.06)",
+                            py: 1,
+                          },
+                        }}
+                      >
                         {["Product", "Qty", "Total", "Time"].map((h) => (
                           <TableCell key={h}>{h}</TableCell>
                         ))}
@@ -276,7 +294,17 @@ export default function Dashboard() {
                         const d = new Date(t.timestamp.seconds * 1000)
                         const isToday = d.toDateString() === todayStr
                         return (
-                          <TableRow key={t.id} sx={{ cursor: "default" }}>
+                          <TableRow
+                            key={t.id}
+                            sx={{
+                              cursor: "default",
+                              "&:hover": { backgroundColor: "#f8fafc" },
+                              "& .MuiTableCell-root": {
+                                borderBottom: "1px solid rgba(0,0,0,0.04)",
+                                fontSize: "0.875rem",
+                              },
+                            }}
+                          >
                             <TableCell>
                               <Typography sx={{ fontSize: "0.85rem", fontWeight: 500, color: "#0f172a" }}>
                                 {t.productName}
@@ -317,7 +345,7 @@ export default function Dashboard() {
 
         {/* Low Stock */}
         <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Card elevation={0} sx={{ ...panelCardSx, height: "100%" }}>
+          <Card elevation={0} sx={{ ...panelCardSx, height: "100%", border: "1px solid rgba(0,0,0,0.06)", borderRadius: "12px" }}>
             <CardContent sx={{ p: "20px !important" }}>
               <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 0.5 }}>
                 <Typography variant="h6" sx={{ fontSize: "0.95rem", color: "#0f172a" }}>
@@ -338,7 +366,12 @@ export default function Dashboard() {
 
               {lowStock.length === 0 ? (
                 <Box sx={{ textAlign: "center", py: 5 }}>
-                  <Box component="img" src="https://i.imgur.com/hHpdKIl.png" alt="All stocked up" sx={{ width: 110, mb: 1.5, opacity: 0.1 }} />
+                  <Box
+                    component="img"
+                    src="https://i.imgur.com/hHpdKIl.png"
+                    alt="All stocked up"
+                    sx={{ width: 110, mb: 1.5, opacity: 0.1 }}
+                  />
                   <Typography variant="body2" color="text.secondary">All stocked up!</Typography>
                 </Box>
               ) : (

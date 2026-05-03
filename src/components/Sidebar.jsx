@@ -1,11 +1,13 @@
 import { Box, Typography, Tooltip } from "@mui/material"
 import { useNavigate, useLocation } from "react-router-dom"
+import { signOut } from "firebase/auth"
+import { auth } from "../firebase"
 import StorefrontIcon from "@mui/icons-material/Storefront"
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined"
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined"
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined"
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined"
-import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined"
+import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined"
 
 const NAV = [
   { icon: <DashboardOutlinedIcon sx={{ fontSize: 18 }} />, label: "Dashboard", path: "/" },
@@ -17,6 +19,11 @@ const NAV = [
 export default function Sidebar() {
   const navigate = useNavigate()
   const { pathname } = useLocation()
+
+  const handleLogout = async () => {
+    await signOut(auth)
+    // onAuthStateChanged in App.jsx will redirect to /login automatically
+  }
 
   return (
     <Box sx={{
@@ -103,7 +110,32 @@ export default function Sidebar() {
         })}
       </Box>
 
-     
+      {/* Logout */}
+      <Tooltip title="Sign out" placement="right">
+        <Box
+          onClick={handleLogout}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1.5,
+            px: 1.5,
+            py: 1.1,
+            borderRadius: "10px",
+            cursor: "pointer",
+            color: "#94a3b8",
+            transition: "all 0.15s ease",
+            "&:hover": {
+              backgroundColor: "#fff5f5",
+              color: "#ef4444",
+            },
+          }}
+        >
+          <LogoutOutlinedIcon sx={{ fontSize: 18 }} />
+          <Typography sx={{ fontSize: "0.85rem", color: "inherit", lineHeight: 1 }}>
+            Sign out
+          </Typography>
+        </Box>
+      </Tooltip>
     </Box>
   )
 }
